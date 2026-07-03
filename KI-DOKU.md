@@ -75,7 +75,7 @@ oder weil das Resultat einfach viel einfacher war, weiss ich nicht.
 Der Code der Website wurde fast exklusiv von KI erstellt. Allerdings wurden
 die meisten Beschreibungen, alle Bilder, alle Ideen und die ganze Doku ohne KI gemacht.
 
-Ich habe eine [Datei](spec.md) erstellt, welche als "Anleitung" dienen sollte
+Ich habe eine [Datei](a3/spec.md) erstellt, welche als "Anleitung" dienen sollte
 Ich habe beiden KIs diese exakte datei gegeben, und gesagt,
 es soll es implementieren.
 
@@ -84,7 +84,7 @@ auch die hauptwebsite. Weil die Gemma Version einfach nicht wirklich
 gut war, und es extrem lang dauern würde, habe ich nach der ersten
 Prompt nicht wirklich weitergemacht.
 
-Als beispiel habe ich folgende prompt benutzt:
+Als beispiel habe ich folgende prompt benutzt um die website anzupassen:
 
 ```
 can you make it so if you hover over a certain part of a product image in the detail view, it will zoom in? some of the text is a little small for some tshirts
