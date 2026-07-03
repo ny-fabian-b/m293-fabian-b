@@ -28,5 +28,14 @@ Die Website wird öffentlich bei [white-monster.ch](https://www.white-monster.ch
 ## Aufgaben
 
 * Im ordner [a1/](a1/) befindet sich die Aufgabe 1.
-* Im ordner [a2/](a2/) befindet sich die Aufgabe 2, mit einem wireframe.
+* Im ordner [a2/](a2/) befindet sich die Aufgabe 2
 * Im ordner [a3/](a3/) befindet sich die Aufgabe 3 (Hauptwebsite).
+
+## Wireframes
+
+Ich habe die wireframes aus drawio exportiert, jedoch
+sind sie teilweise gebrochen beim exportieren.
+
+## Styleguide
+
+Die [anleitung](a3/spec.md) soll als styleguide dienen

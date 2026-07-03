@@ -72,10 +72,12 @@ oder weil das Resultat einfach viel einfacher war, weiss ich nicht.
 
 ## KI einsatz
 
-Der Code der Website wurde fast exklusiv von KI erstellt. Allerdings wurden
+Der Code der Hauptwebsite wurde fast exklusiv von KI erstellt. Allerdings wurden
 die meisten Beschreibungen, alle Bilder, alle Ideen und die ganze Doku ohne KI gemacht.
 
-Ich habe eine [Datei](a3/spec.md) erstellt, welche als "Anleitung" dienen sollte
+Der code der website von aufgabe 1 und 2 wurde exklusiv von mir geschrieben.
+
+Ich habe eine [Datei](a3/spec.md) erstellt, welche als "Anleitung" dienen sollte.
 Ich habe beiden KIs diese exakte datei gegeben, und gesagt,
 es soll es implementieren.
 
