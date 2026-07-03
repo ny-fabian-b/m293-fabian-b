@@ -27,6 +27,10 @@
                 <h1 class="logo-text">posix-store --init</h1>
             </div>
             
+            <button class="mobile-nav-toggle" aria-label="Toggle Navigation" onclick="toggleMobileMenu()">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            
             <nav class="main-nav">
                 <a href="#home" class="nav-link active" data-view="home">
                     <span class="nav-num">01_</span>home
@@ -43,24 +47,7 @@
                 </a>
             </nav>
 
-            <div class="system-status">
-                <div class="status-item">
-                    <span class="status-label">LOC:</span>
-                    <span class="status-value">CH</span>
-                </div>
-                <div class="status-item">
-                    <span class="status-label">CURR:</span>
-                    <span class="status-value">CHF</span>
-                </div>
-                <div class="status-item">
-                    <span class="status-label">SHELL:</span>
-                    <span class="status-value">bash</span>
-                </div>
-                <div class="status-item pulse-dot-container">
-                    <span class="pulse-dot"></span>
-                    <span class="status-value text-green">ONLINE</span>
-                </div>
-            </div>
+
         </header>
 
         <!-- Main Workspace -->
@@ -131,7 +118,6 @@
                                 <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/4_x0USuQ9Ss?si=0V-ArHDkmk91m5V3" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
                             </div>
                             <div class="video-fallback" id="video-local-fallback" style="display: none;">
-                                <span class="text-dim">Running locally via file:// protocol?</span>
                                 <a href="https://youtu.be/4_x0USuQ9Ss" target="_blank" class="fallback-link">
                                     <i class="fa-solid fa-arrow-up-right-from-square"></i> Watch directly on YouTube
                                 </a>
@@ -146,53 +132,58 @@
                 <div class="catalog-layout">
                     <!-- Sidebar Filters -->
                     <aside class="catalog-filters">
-                        <div class="filter-header">
-                            <h3><i class="fa-solid fa-sliders"></i> Filters</h3>
+                        <div class="filter-header" onclick="toggleMobileFilters()">
+                            <h3>
+                                <span><i class="fa-solid fa-sliders"></i> Filters</span>
+                                <span class="filter-toggle-icon" style="display: none;"><i class="fa-solid fa-chevron-down"></i></span>
+                            </h3>
                         </div>
                         
-                        <div class="filter-group">
-                            <label for="search-input">grep -i "keyword"</label>
-                            <div class="search-box">
-                                <i class="fa-solid fa-magnifying-glass"></i>
-                                <input type="text" id="search-input" placeholder="Filter articles...">
+                        <div class="filter-body-wrapper">
+                            <div class="filter-group">
+                                <label for="search-input">grep -i "keyword"</label>
+                                <div class="search-box">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                    <input type="text" id="search-input" placeholder="Filter articles...">
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="filter-group">
-                            <label>category --filter</label>
-                            <div class="radio-group">
-                                <label class="radio-label">
-                                    <input type="radio" name="category" value="all" checked>
-                                    <span class="radio-custom"></span> All Products
-                                </label>
-                                <label class="radio-label">
-                                    <input type="radio" name="category" value="shirts">
-                                    <span class="radio-custom"></span> T-Shirts
-                                </label>
-                                <label class="radio-label">
-                                    <input type="radio" name="category" value="drinks">
-                                    <span class="radio-custom"></span> Drinks
-                                </label>
-                                <label class="radio-label">
-                                    <input type="radio" name="category" value="collectibles">
-                                    <span class="radio-custom"></span> Collectibles
-                                </label>
+                            <div class="filter-group">
+                                <label>category --filter</label>
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="category" value="all" checked>
+                                        <span class="radio-custom"></span> All Products
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="category" value="shirts">
+                                        <span class="radio-custom"></span> T-Shirts
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="category" value="drinks">
+                                        <span class="radio-custom"></span> Drinks
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="category" value="collectibles">
+                                        <span class="radio-custom"></span> Collectibles
+                                    </label>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="filter-group">
-                            <label for="sort-select">sort --by</label>
-                            <select id="sort-select" class="terminal-select">
-                                <option value="default">Default ID</option>
-                                <option value="price-asc">Price (low -> high)</option>
-                                <option value="price-desc">Price (high -> low)</option>
-                                <option value="name-asc">Name (A -> Z)</option>
-                            </select>
-                        </div>
+                            <div class="filter-group">
+                                <label for="sort-select">sort --by</label>
+                                <select id="sort-select" class="terminal-select">
+                                    <option value="default">Default ID</option>
+                                    <option value="price-asc">Price (low -> high)</option>
+                                    <option value="price-desc">Price (high -> low)</option>
+                                    <option value="name-asc">Name (A -> Z)</option>
+                                </select>
+                            </div>
 
-                        <button class="terminal-btn btn-block" onclick="resetFilters()">
-                            <i class="fa-solid fa-arrows-rotate"></i> reset --filters
-                        </button>
+                            <button class="terminal-btn btn-block" onclick="resetFilters()">
+                                <i class="fa-solid fa-arrows-rotate"></i> reset --filters
+                            </button>
+                        </div>
                     </aside>
 
                     <!-- Products Grid Container -->
@@ -295,7 +286,7 @@
                 <div class="checkout-overlay" id="checkout-modal">
                     <div class="checkout-modal-content">
                         <div class="modal-header">
-                            <span class="modal-title"><i class="fa-solid fa-terminal text-green"></i> transaction_logger.sh</span>
+                            <span class="modal-title"><i class="fa-solid fa-receipt text-green"></i> order_invoice.txt</span>
                             <span class="modal-close" onclick="closeCheckoutModal()"><i class="fa-solid fa-xmark"></i></span>
                         </div>
                         <div class="modal-terminal-body" id="modal-terminal-output">

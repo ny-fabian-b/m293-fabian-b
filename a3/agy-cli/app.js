@@ -231,6 +231,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     document.getElementById("sort-select").addEventListener("change", filterAndRenderCatalog);
 
+    // Collapse filters by default on mobile (<= 1024px)
+    if (window.innerWidth <= 1024) {
+        const filters = document.querySelector(".catalog-filters");
+        if (filters) {
+            filters.classList.add("collapsed");
+        }
+    }
+
     // Show fallback video link only if running locally via file://
     if (window.location.protocol === 'file:') {
         const fallback = document.getElementById('video-local-fallback');
@@ -297,6 +305,14 @@ function handleHashRoute() {
     const hash = window.location.hash || "#home";
     const parts = hash.split("/");
     const viewName = parts[0].substring(1); // Remove '#'
+
+    // Close mobile menu if open on route change
+    const mainNav = document.querySelector(".main-nav");
+    const toggleBtn = document.querySelector(".mobile-nav-toggle i");
+    if (mainNav && toggleBtn) {
+        mainNav.classList.remove("open");
+        toggleBtn.className = "fa-solid fa-bars";
+    }
 
     // Handle view classes
     document.querySelectorAll(".app-view").forEach(view => {
@@ -671,80 +687,68 @@ function handlePayment(event) {
     const card = document.getElementById("pay-card").value;
     const totalText = document.getElementById("summary-total").textContent;
 
-    // Show simulation modal
+    // Show confirmation modal
     const modal = document.getElementById("checkout-modal");
     modal.classList.add("active");
 
     const terminalBody = document.getElementById("modal-terminal-output");
-    terminalBody.innerHTML = ""; // Clear log
+    
+    // Generate clean receipt
+    const txId = `CH-${Math.floor(Math.random() * 9000000 + 1000000)}`;
+    const invoiceNum = `INV-2026-${Math.floor(Math.random() * 90000 + 10000)}`;
+    
+    let receiptHtml = `
+<div style="font-family: var(--font-mono); line-height: 1.6;">
+    <div style="color: var(--accent-green); font-weight: bold; font-size: 1.1rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fa-solid fa-circle-check"></i> ORDER SUCCESSFULLY PLACED
+    </div>
+    <div style="border-top: 1px dashed var(--border-color); border-bottom: 1px dashed var(--border-color); padding: 1rem 0; margin-bottom: 1.25rem; display: flex; flex-direction: column; gap: 0.4rem;">
+        <div style="display: flex; justify-content: space-between;"><span style="color: var(--text-secondary);">Invoice Number:</span><span style="font-weight: 500;">${invoiceNum}</span></div>
+        <div style="display: flex; justify-content: space-between;"><span style="color: var(--text-secondary);">Transaction ID:</span><span style="font-weight: 500;">${txId}</span></div>
+        <div style="display: flex; justify-content: space-between;"><span style="color: var(--text-secondary);">Date:</span><span style="font-weight: 500;">${new Date().toISOString().replace('T', ' ').substring(0, 19)} UTC</span></div>
+        <div style="display: flex; justify-content: space-between;"><span style="color: var(--text-secondary);">Customer:</span><span style="font-weight: 500;">${name}</span></div>
+        <div style="display: flex; justify-content: space-between;"><span style="color: var(--text-secondary);">Email:</span><span style="font-weight: 500;">${email}</span></div>
+        <div style="display: flex; justify-content: space-between;"><span style="color: var(--text-secondary);">Payment Method:</span><span style="font-weight: 500;">Card ending in ${card.slice(-4)}</span></div>
+    </div>
+    
+    <div style="margin-bottom: 1.25rem;">
+        <div style="color: var(--accent-cyan); font-weight: bold; margin-bottom: 0.75rem; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px;">Items Ordered:</div>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+    `;
 
-    // Print lines sequentially to make it feel like compilation & transaction approval
-    const logLines = [
-        { text: `[SYSTEM] Initializing transaction gateway pipeline...`, type: "dim" },
-        { text: `Connecting to secure Swiss-Transact server (api.swiss-transact.ch)...`, type: "default" },
-        { text: `[OK] Socket open. Cryptographic Handshake successful (TLS 1.3).`, type: "green" },
-        { text: `Validating merchant configuration (POSIX Store ID: 0x93FA8B)...`, type: "default" },
-        { text: `Processing payload with token for credit card ending in ${card.slice(-4)}...`, type: "dim" },
-        { text: `Executing credit card check (Luhn formula verification)...`, type: "default" },
-        { text: `[OK] Luhn checksum matches standard ISO/IEC 7812.`, type: "green" },
-        { text: `Contacting banking authority server for approval of ${totalText}...`, type: "default" },
-        { text: `Waiting for issuer authorization response... [0x17A]`, type: "dim" },
-        { text: `[OK] Transaction approved by card issuer. AuthCode: POSIX-${Math.floor(Math.random() * 90000 + 10000)}`, type: "green" },
-        { text: `Clearing local shopping cart database caches...`, type: "default" },
-        { text: `[OK] Local Cache Flushed. localStorage cleared.`, type: "green" },
-        { text: `Formatting POSIX receipt format. Generating raw ASCII data...`, type: "dim" },
-        { text: `================================================`, type: "default" },
-        { text: `      POSIX STORE SWITZERLAND - RECEIPT         `, type: "green" },
-        { text: `      Invoice Number: INV-2026-${Math.floor(Math.random() * 90000 + 10000)}`, type: "green" },
-        { text: `      Date: ${new Date().toISOString().replace('T', ' ').substring(0, 19)} UTC`, type: "green" },
-        { text: `------------------------------------------------`, type: "default" },
-    ];
-
-    // Append cart item lines to receipt
     state.cart.forEach(item => {
         const prod = PRODUCTS.find(p => p.id === item.productId);
         if (prod) {
             const lineTotal = prod.price * item.quantity;
-            const spacer = " ".repeat(Math.max(2, 35 - prod.name.length - String(item.quantity).length));
-            logLines.push({ text: `      ${item.quantity}x ${prod.name}${spacer}CHF ${lineTotal.toFixed(2)}`, type: "green" });
+            receiptHtml += `
+            <div style="display: flex; justify-content: space-between; font-size: 0.9rem;">
+                <span style="color: var(--text-primary);">${item.quantity}x ${prod.name}</span>
+                <span style="font-family: var(--font-mono); color: var(--text-primary);">CHF ${lineTotal.toFixed(2)}</span>
+            </div>`;
         }
     });
 
-    logLines.push(
-        { text: `------------------------------------------------`, type: "default" },
-        { text: `      Grand Total:${" ".repeat(21)}${totalText}`, type: "green" },
-        { text: `================================================`, type: "default" },
-        { text: `Sending invoice copy to user email...`, type: "default" },
-        { text: `$ mail -s "Invoice: POSIX-Store order" ${email} < invoice.txt`, type: "dim" },
-        { text: `[OK] Mail sent. Delivery route established.`, type: "green" },
-        { text: `Scheduling Swiss Post package courier system dispatch...`, type: "default" },
-        { text: `[OK] Logistics scheduled. Tracking label #CH-${Math.floor(Math.random() * 9000000 + 1000000)} created.`, type: "green" },
-        { text: `[SUCCESS] transaction complete. Status: 0 (Success).`, type: "green" }
-    );
+    receiptHtml += `
+        </div>
+    </div>
+    
+    <div style="border-top: 1px dashed var(--border-color); padding-top: 1rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; font-weight: bold; font-size: 1.1rem; color: var(--accent-green);">
+        <span>TOTAL PAID:</span>
+        <span>${totalText}</span>
+    </div>
+    
+    <div style="color: var(--text-secondary); font-size: 0.85rem; text-align: center; padding: 0.75rem; background: var(--bg-tertiary); border-radius: var(--border-radius); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; gap: 0.5rem; border-color: rgba(245, 158, 11, 0.3);">
+        <i class="fa-solid fa-triangle-exclamation" style="color: var(--accent-amber);"></i>
+        <span><strong>Simulated Order:</strong> This is a mock checkout. No payment has been charged and no email was sent.</span>
+    </div>
+</div>
+    `;
 
-    let lineIdx = 0;
-    const printInterval = setInterval(() => {
-        if (lineIdx < logLines.length) {
-            const line = logLines[lineIdx];
-            const div = document.createElement("div");
-            div.className = "cli-line";
+    terminalBody.innerHTML = receiptHtml;
 
-            if (line.type === "green") div.classList.add("cli-success");
-            else if (line.type === "dim") div.classList.add("text-dim");
-            else if (line.type === "warn") div.classList.add("cli-warn");
-            else if (line.type === "error") div.classList.add("cli-error");
-
-            div.textContent = line.text;
-            terminalBody.appendChild(div);
-            terminalBody.scrollTop = terminalBody.scrollHeight;
-            lineIdx++;
-        } else {
-            clearInterval(printInterval);
-            // Empty the actual cart and update UI
-            state.cart = [];
-            saveCartToStorage();
-        }
-    }, 200);
+    // Empty the actual cart and update UI
+    state.cart = [];
+    saveCartToStorage();
 }
 window.handlePayment = handlePayment;
 
@@ -809,11 +813,49 @@ function adjustMainPadding() {
     const footer = document.querySelector(".app-footer");
     const main = document.querySelector(".app-main");
     if (footer && main) {
-        const footerHeight = footer.offsetHeight;
-        main.style.paddingBottom = `${footerHeight + 24}px`; // Add 24px extra breathing room
+        const isFixed = window.getComputedStyle(footer).position === 'fixed';
+        if (isFixed) {
+            const footerHeight = footer.offsetHeight;
+            main.style.paddingBottom = `${footerHeight + 24}px`; // Add 24px extra breathing room
+        } else {
+            main.style.paddingBottom = "2rem"; // Default padding when footer is not fixed
+        }
     }
 }
 window.adjustMainPadding = adjustMainPadding;
+
+// --- MOBILE CONTROLS ---
+function toggleMobileMenu() {
+    const mainNav = document.querySelector(".main-nav");
+    const toggleBtn = document.querySelector(".mobile-nav-toggle i");
+    if (mainNav && toggleBtn) {
+        mainNav.classList.toggle("open");
+        if (mainNav.classList.contains("open")) {
+            toggleBtn.className = "fa-solid fa-xmark";
+        } else {
+            toggleBtn.className = "fa-solid fa-bars";
+        }
+    }
+}
+window.toggleMobileMenu = toggleMobileMenu;
+
+function toggleMobileFilters() {
+    if (window.innerWidth <= 1024) {
+        const filters = document.querySelector(".catalog-filters");
+        if (filters) {
+            filters.classList.toggle("collapsed");
+            const icon = filters.querySelector(".filter-toggle-icon i");
+            if (icon) {
+                if (filters.classList.contains("collapsed")) {
+                    icon.className = "fa-solid fa-chevron-down";
+                } else {
+                    icon.className = "fa-solid fa-chevron-up";
+                }
+            }
+        }
+    }
+}
+window.toggleMobileFilters = toggleMobileFilters;
 
 // --- TOAST NOTIFICATION UTILITY ---
 function showToast(title, message, duration = 3000) {
